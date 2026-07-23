@@ -2,33 +2,61 @@
   {
     "album": "SOUR",
     "release_year": 2021,
-    "color": "#d6c3e6", 
-    "total_streams": 11500000000,
+    "color": "#d6c3e6",
+    "total_streams": 6008000000,
     "tracks": [
-      { "name": "drivers license", "streams": 2100000000, "meaning": "The heartbreak that started it all." },
-      { "name": "good 4 u", "streams": 2000000000, "meaning": "Upbeat pop-punk anger." },
-      { "name": "deja vu", "streams": 1400000000, "meaning": "Watching an ex repeat your relationship with someone else." }
+      { "name": "brutal", "streams": 200000000, "meaning": "The frustrating, chaotic reality of teenage anxiety and expectations." },
+      { "name": "traitor", "streams": 896000000, "meaning": "Feeling betrayed when an ex moves on before the relationship is even technically over." },
+      { "name": "drivers license", "streams": 1200000000, "meaning": "The heartbreak of driving past an ex's house after obtaining a driver's license." },
+      { "name": "1 step forward, 3 steps back", "streams": 77000000, "meaning": "Walking on eggshells in an unpredictable relationship dynamic." },
+      { "name": "deja vu", "streams": 1100000000, "meaning": "Watching an ex repeat your shared experiences with someone new." },
+      { "name": "good 4 u", "streams": 987000000, "meaning": "High-energy pop-punk sarcasm directed at an ex moving on unharmed." },
+      { "name": "enough for you", "streams": 98000000, "meaning": "Exhaustion from constantly trying to mold yourself for someone's approval." },
+      { "name": "happier", "streams": 734000000, "meaning": "Selfishly hoping an ex stays happy, but never quite as happy as they were with you." },
+      { "name": "jealousy, jealousy", "streams": 389000000, "meaning": "The toxic nature of social media comparison and youth insecurity." },
+      { "name": "favorite crime", "streams": 275000000, "meaning": "Complicity in letting someone break your heart for the sake of love." },
+      { "name": "hope ur ok", "streams": 52000000, "meaning": "A quiet note of support to old friends struggling with unaccepting environments." }
     ]
   },
   {
     "album": "GUTS",
     "release_year": 2023,
     "color": "#947bbb",
-    "total_streams": 3500000000,
+    "total_streams": 1027000000,
     "tracks": [
-      { "name": "vampire", "streams": 900000000, "meaning": "Feeling used by an older partner." },
-      { "name": "bad idea right?", "streams": 450000000, "meaning": "The temptation of relapsing with an ex." }
+      { "name": "all-american bitch", "streams": 44000000, "meaning": "Satirizing the impossible societal standards placed on young women." },
+      { "name": "bad idea right?", "streams": 123000000, "meaning": "Playfully wrestling with the bad decision of hooking up with an ex." },
+      { "name": "vampire", "streams": 461000000, "meaning": "Processing the anger of being exploited by an older partner." },
+      { "name": "lacy", "streams": 61000000, "meaning": "An obsessive blend of envy, admiration, and insecurity toward another woman." },
+      { "name": "ballad of a homeschooled girl", "streams": 30000000, "meaning": "Social awkwardness and the constant feeling of making social blunders." },
+      { "name": "making the bed", "streams": 32000000, "meaning": "Taking accountability for constructing a life you suddenly feel detached from." },
+      { "name": "logical", "streams": 27000000, "meaning": "How love can manipulate reason into believing impossible lies." },
+      { "name": "get him back!", "streams": 125000000, "meaning": "The double meaning of wanting revenge vs. wanting an ex back." },
+      { "name": "love is embarrassing", "streams": 29000000, "meaning": "Cringed self-awareness after over-investing in someone who wasn't worth it." },
+      { "name": "the grudge", "streams": 36000000, "meaning": "The painful difficulty of forgiving someone who deeply hurt you." },
+      { "name": "pretty isn't pretty", "streams": 35000000, "meaning": "Body dysmorphia and the relentless pressure of beauty standards." },
+      { "name": "teenage dream", "streams": 24000000, "meaning": "Fears of peaking early and growing up." }
     ]
   },
   {
     "album": "you seem pretty sad for a girl so in love",
     "release_year": 2026,
-    "color": "#ffb6c1", 
-    "total_streams": 1200000000,
+    "color": "#ffb6c1",
+    "total_streams": 287700000,
     "tracks": [
-      { "name": "the cure", "streams": 300000000, "meaning": "A mature step forward into alternative rock." },
-      { "name": "honeybee", "streams": 250000000, "meaning": "A tragic, sweet lullaby about knowing a relationship will end." },
-      { "name": "drop dead", "streams": 200000000, "meaning": "Falling in love in the bathroom line at a bar." }
+      { "name": "drop dead", "streams": 100000000, "meaning": "Falling hopelessly in love in an unglamorous setting like a bar bathroom line." },
+      { "name": "stupid song", "streams": 35000000, "meaning": "Self-conscious frustration over writing another heart-wrenching track." },
+      { "name": "honeybee", "streams": 21000000, "meaning": "A bittersweet lullaby acknowledging a romance heading toward a quiet end." },
+      { "name": "maggots for brains", "streams": 10000000, "meaning": "Self-deprecating reflection on overthinking and mental paralysis." },
+      { "name": "u + me = <3", "streams": 790000, "meaning": "Naive nostalgia for early-stage romantic ideals." },
+      { "name": "my way", "streams": 9900000, "meaning": "Reclaiming agency after a period of emotional codependency." },
+      { "name": "purple", "streams": 6300000, "meaning": "Mourning the fading blend of red (anger) and blue (sadness) into acceptance." },
+      { "name": "the cure", "streams": 51000000, "meaning": "A mature leap into alternative rock and emotional restoration." },
+      { "name": "begged", "streams": 8700000, "meaning": "The humility and pain of pleading for someone to stay." },
+      { "name": "what's wrong with me", "streams": 9200000, "meaning": "A collaborative introspection on chronic self-doubt." },
+      { "name": "less", "streams": 12000000, "meaning": "Learning to live with lower expectations to avoid continuous disappointment." },
+      { "name": "expectations", "streams": 9600000, "meaning": "Deconstructing the burden of internal and external pressure." },
+      { "name": "cigarette smoke", "streams": 7100000, "meaning": "Atmospheric reflection on lingering emotional remnants after a breakup." }
     ]
   }
 ]
