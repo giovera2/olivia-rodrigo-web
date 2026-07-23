@@ -58,7 +58,7 @@
 
     <!-- Navigation Trigger -->
     <div id="controls">
-        <button id="btn-overview">Back to Album Overview</button>
+        <button id="btn-overview" style="display: none;">Back to Album Overview</button>
     </div>
 
     <!-- Container for D3 SVG -->
@@ -69,7 +69,7 @@
         // 1. Setup the SVG canvas and dynamic margins
         const width = 800;
         const height = 600;
-        const margin = { top: 70, right: 50, bottom: 130, left: 100 }; // Extra bottom margin for rotated track names
+        const margin = { top: 70, right: 50, bottom: 130, left: 100 };
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
 
@@ -110,18 +110,21 @@
             currentScene = "overview";
             d3.select("#scene-description").text("Overview: Total streams across Olivia Rodrigo's discography. Click a bar to drill down into the album's tracks.");
             
+            // Hide the "Back to Album Overview" button on the overview page
+            d3.select("#btn-overview").style("display", "none");
+
             // Clear previous scene
             chartGroup.selectAll("*").remove(); 
 
             // Set up Scales
             const xScale = d3.scaleBand()
-                             .domain(globalData.map(d => d.album))
-                             .range([0, innerWidth])
-                             .padding(0.3);
+                           .domain(globalData.map(d => d.album))
+                           .range([0, innerWidth])
+                           .padding(0.3);
 
             const yScale = d3.scaleLinear()
-                             .domain([0, d3.max(globalData, d => d.total_streams) * 1.1]) // 10% headroom
-                             .range([innerHeight, 0]);
+                           .domain([0, d3.max(globalData, d => d.total_streams) * 1.1])
+                           .range([innerHeight, 0]);
 
             // Draw Axes
             const yAxis = d3.axisLeft(yScale)
@@ -136,7 +139,7 @@
                       .style("font-size", "14px")
                       .selectAll("text")
                       .style("text-anchor", "middle")
-                      .call(wrapText, xScale.bandwidth()); // Handle the long 3rd album name
+                      .call(wrapText, xScale.bandwidth());
 
             // Draw Bars
             chartGroup.selectAll(".bar")
@@ -185,7 +188,7 @@
                     wrap: 150
                 },
                 x: xScale("SOUR") + xScale.bandwidth() / 2,
-                y: yScale(6008000000), // Matching SOUR's streams
+                y: yScale(6008000000), 
                 dy: -40,
                 dx: 50
             }];
@@ -206,6 +209,9 @@
             currentScene = "albumDetails";
             d3.select("#scene-description").text(`Drill down: Track streams and meanings for ${albumData.album}. Hover for details.`);
             
+            // Show the "Back to Album Overview" button when inside album details view
+            d3.select("#btn-overview").style("display", "inline-block");
+
             // Clear previous scene
             chartGroup.selectAll("*").remove(); 
             
@@ -214,13 +220,13 @@
 
             // Set up Scales
             const xScale = d3.scaleBand()
-                             .domain(sortedTracks.map(d => d.name))
-                             .range([0, innerWidth])
-                             .padding(0.2);
+                           .domain(sortedTracks.map(d => d.name))
+                           .range([0, innerWidth])
+                           .padding(0.2);
 
             const yScale = d3.scaleLinear()
-                             .domain([0, d3.max(sortedTracks, d => d.streams) * 1.1])
-                             .range([innerHeight, 0]);
+                           .domain([0, d3.max(sortedTracks, d => d.streams) * 1.1])
+                           .range([innerHeight, 0]);
 
             // Draw Axes
             const yAxis = d3.axisLeft(yScale)
@@ -236,7 +242,7 @@
                       .style("text-anchor", "end")
                       .attr("dx", "-.8em")
                       .attr("dy", ".15em")
-                      .attr("transform", "rotate(-45)") // Rotate long track titles
+                      .attr("transform", "rotate(-45)")
                       .style("font-size", "11px");
 
             // Draw Track Bars
@@ -249,7 +255,7 @@
                       .attr("y", innerHeight)
                       .attr("width", xScale.bandwidth())
                       .attr("height", 0)
-                      .attr("fill", albumData.color) // Keep the parent album's aesthetic
+                      .attr("fill", albumData.color)
                       
                       // Hover triggers showing track meaning
                       .on("mouseover", (event, d) => {
@@ -272,7 +278,7 @@
                       .attr("y", d => yScale(d.streams))
                       .attr("height", d => innerHeight - yScale(d.streams));
 
-            // Scene 2 Annotation (Points out the top track automatically)
+            // Scene 2 Annotation
             const topTrack = sortedTracks[0];
             const annotations = [{
                 note: {
@@ -298,7 +304,6 @@
         }
 
         // 6. Utility Functions
-        // Wraps SVG text for long album names on the X-axis
         function wrapText(text, width) {
             text.each(function() {
                 let text = d3.select(this),
