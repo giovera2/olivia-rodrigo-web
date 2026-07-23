@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Olivia Rodrigo: Album to Track Analysis</title>
+    <!-- Load D3.js -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Load d3-annotation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #f9f9f9;
+            background-color: #f9f9f9; 
         }
         #chart-container {
             width: 800px;
@@ -19,173 +21,311 @@
             background-color: white;
             border: 1px solid #ccc;
             box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            position: relative;
         }
         .tooltip {
             position: absolute;
             background: white;
             border: 1px solid #ccc;
-            padding: 10px;
+            padding: 12px;
             pointer-events: none;
             opacity: 0;
             font-size: 14px;
+            max-width: 250px;
+            text-align: left;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
+            border-radius: 4px;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #eee;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        button:hover {
+            background-color: #ddd;
         }
     </style>
 </head>
 <body>
 
     <h1>Olivia Rodrigo's Streaming Evolution</h1>
-    <p id="scene-description">Overview: Total streams for SOUR, GUTS, and you seem pretty sad for a girl so in love</p>
+    <p id="scene-description">Loading data...</p>
 
+    <!-- Navigation Trigger -->
     <div id="controls">
-        <button id="btn-overview">Album Overview</button>
-        <button id="btn-sour">SOUR</button>
-        <button id="btn-guts">GUTS</button>
-        <button id="btn-guts">you seem pretty sad for a girl so in love</button>
+        <button id="btn-overview">Back to Album Overview</button>
     </div>
 
+    <!-- Container for D3 SVG -->
     <div id="chart-container"></div>
     <div id="tooltip" class="tooltip"></div>
 
     <script>
-    // 1. Setup the SVG canvas and margins
-    const width = 800;
-    const height = 600;
-    const margin = { top: 70, right: 50, bottom: 60, left: 100 };
-    const innerWidth = width - margin.left - margin.right;
-    const innerHeight = height - margin.top - margin.bottom;
+        // 1. Setup the SVG canvas and dynamic margins
+        const width = 800;
+        const height = 600;
+        const margin = { top: 70, right: 50, bottom: 130, left: 100 }; // Extra bottom margin for rotated track names
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
 
-    const svg = d3.select("#chart-container")
-                  .append("svg")
-                  .attr("width", width)
-                  .attr("height", height);
+        const svg = d3.select("#chart-container")
+                      .append("svg")
+                      .attr("width", width)
+                      .attr("height", height);
 
-    const chartGroup = svg.append("g")
-                          .attr("transform", `translate(${margin.left},${margin.top})`);
+        const chartGroup = svg.append("g")
+                              .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const tooltip = d3.select("#tooltip");
+        const tooltip = d3.select("#tooltip");
 
-    // 2. Parameters (State Variables)
-    let currentScene = "overview"; 
-    let globalData = []; // Will hold our JSON data
+        // 2. Parameters (State Variables)
+        let currentScene = "overview"; 
+        let globalData = []; 
 
-    // 3. Load Data
-    d3.json("data.json").then(data => {
-        globalData = data;
-        drawOverview(); // Draw the first scene once data is loaded
-    });
+        // 3. Load Data
+        d3.json("data.json").then(data => {
+            globalData = data;
+            drawOverview(); // Trigger initial scene
+        }).catch(error => {
+            console.error("Error loading data:", error);
+            d3.select("#scene-description").text("Error loading data. Ensure your repository is published and formatting is correct.");
+        });
 
-    // 4. Scene 1: Album Overview (Bar Chart)
-    function drawOverview() {
-        currentScene = "overview";
-        d3.select("#scene-description").text("Overview: Total streams across Olivia Rodrigo's discography. Click a bar to drill down into the album's tracks.");
-        
-        // Clear previous scene
-        chartGroup.selectAll("*").remove(); 
+        // Formatter for millions (M) and billions (B)
+        function formatStreams(streams) {
+            if (streams >= 1000000000) {
+                return (streams / 1000000000).toFixed(2) + "B";
+            } else {
+                return (streams / 1000000).toFixed(1) + "M";
+            }
+        }
 
-        // Set up Scales
-        const xScale = d3.scaleBand()
-                         .domain(globalData.map(d => d.album))
-                         .range([0, innerWidth])
-                         .padding(0.3);
+        // 4. Scene 1: Album Overview (Bar Chart)
+        function drawOverview() {
+            currentScene = "overview";
+            d3.select("#scene-description").text("Overview: Total streams across Olivia Rodrigo's discography. Click a bar to drill down into the album's tracks.");
+            
+            // Clear previous scene
+            chartGroup.selectAll("*").remove(); 
 
-        const yScale = d3.scaleLinear()
-                         .domain([0, d3.max(globalData, d => d.total_streams) * 1.1]) // Add 10% padding to top
-                         .range([innerHeight, 0]);
+            // Set up Scales
+            const xScale = d3.scaleBand()
+                             .domain(globalData.map(d => d.album))
+                             .range([0, innerWidth])
+                             .padding(0.3);
 
-        // Draw Axes
-        const yAxis = d3.axisLeft(yScale)
-                        .tickFormat(d => (d / 1000000000).toFixed(1) + "B"); // Format as Billions
-        
-        chartGroup.append("g").call(yAxis)
-                  .style("font-size", "14px");
+            const yScale = d3.scaleLinear()
+                             .domain([0, d3.max(globalData, d => d.total_streams) * 1.1]) // 10% headroom
+                             .range([innerHeight, 0]);
 
-        chartGroup.append("g")
-                  .attr("transform", `translate(0,${innerHeight})`)
-                  .call(d3.axisBottom(xScale))
-                  .style("font-size", "14px");
+            // Draw Axes
+            const yAxis = d3.axisLeft(yScale)
+                            .tickFormat(d => formatStreams(d));
+            
+            chartGroup.append("g").call(yAxis)
+                      .style("font-size", "14px");
 
-        // Draw Bars
-        chartGroup.selectAll(".bar")
-                  .data(globalData)
-                  .enter()
-                  .append("rect")
-                  .attr("class", "bar")
-                  .attr("x", d => xScale(d.album))
-                  .attr("y", innerHeight) // Start at bottom for animation
-                  .attr("width", xScale.bandwidth())
-                  .attr("height", 0) // Start with 0 height for animation
-                  .attr("fill", d => d.color)
-                  .style("cursor", "pointer") // Let user know it's clickable
-                  
-                  // Triggers: Hover events for tooltips
-                  .on("mouseover", (event, d) => {
-                      tooltip.style("opacity", 1)
-                             .html(`<strong>${d.album}</strong><br>Released: ${d.release_year}<br>Streams: ${(d.total_streams / 1000000000).toFixed(2)} Billion`);
-                      d3.select(event.currentTarget).attr("stroke", "black").attr("stroke-width", 2);
-                  })
-                  .on("mousemove", (event) => {
-                      tooltip.style("left", (event.pageX + 15) + "px")
-                             .style("top", (event.pageY - 20) + "px");
-                  })
-                  .on("mouseout", (event) => {
-                      tooltip.style("opacity", 0);
-                      d3.select(event.currentTarget).attr("stroke", "none");
-                  })
-                  
-                  // Trigger: Click to drill down (Scene 2)
-                  .on("click", (event, d) => {
-                      drawAlbumDetails(d); 
-                  })
-                  
-                  // Transition Animation
-                  .transition()
-                  .duration(800)
-                  .attr("y", d => yScale(d.total_streams))
-                  .attr("height", d => innerHeight - yScale(d.total_streams));
+            chartGroup.append("g")
+                      .attr("transform", `translate(0,${innerHeight})`)
+                      .call(d3.axisBottom(xScale))
+                      .style("font-size", "14px")
+                      .selectAll("text")
+                      .style("text-anchor", "middle")
+                      .call(wrapText, xScale.bandwidth()); // Handle the long 3rd album name
 
-        // Add D3-Annotation
-        const annotations = [{
-            note: {
-                label: "Debut album with record-breaking streams.",
-                title: "Massive Debut",
-                wrap: 150
-            },
-            x: xScale("SOUR") + xScale.bandwidth() / 2,
-            y: yScale(11500000000),
-            dy: -40,
-            dx: 50
-        }];
+            // Draw Bars
+            chartGroup.selectAll(".bar")
+                      .data(globalData)
+                      .enter()
+                      .append("rect")
+                      .attr("class", "bar")
+                      .attr("x", d => xScale(d.album))
+                      .attr("y", innerHeight) 
+                      .attr("width", xScale.bandwidth())
+                      .attr("height", 0) 
+                      .attr("fill", d => d.color)
+                      .style("cursor", "pointer")
+                      
+                      // Hover triggers
+                      .on("mouseover", (event, d) => {
+                          tooltip.style("opacity", 1)
+                                 .html(`<strong>${d.album}</strong><br>Released: ${d.release_year}<br>Streams: ${formatStreams(d.total_streams)}`);
+                          d3.select(event.currentTarget).attr("stroke", "black").attr("stroke-width", 2);
+                      })
+                      .on("mousemove", (event) => {
+                          tooltip.style("left", (event.pageX + 15) + "px")
+                                 .style("top", (event.pageY - 20) + "px");
+                      })
+                      .on("mouseout", (event) => {
+                          tooltip.style("opacity", 0);
+                          d3.select(event.currentTarget).attr("stroke", "none");
+                      })
+                      
+                      // Click trigger for Drill-Down
+                      .on("click", (event, d) => {
+                          drawAlbumDetails(d); 
+                      })
+                      
+                      // Enter transition
+                      .transition()
+                      .duration(800)
+                      .attr("y", d => yScale(d.total_streams))
+                      .attr("height", d => innerHeight - yScale(d.total_streams));
 
-        const makeAnnotations = d3.annotation().annotations(annotations);
-        chartGroup.append("g")
-                  .attr("class", "annotation-group")
-                  .style("font-size", "12px")
-                  .call(makeAnnotations)
-                  .style("opacity", 0)
-                  .transition()
-                  .delay(800) // Show after bars animate
-                  .style("opacity", 1);
-    }
+            // Scene 1 Annotations
+            const annotations = [{
+                note: {
+                    label: "Her breakout debut remains the most streamed project.",
+                    title: "Massive Debut",
+                    wrap: 150
+                },
+                x: xScale("SOUR") + xScale.bandwidth() / 2,
+                y: yScale(6008000000), // Matching SOUR's streams
+                dy: -40,
+                dx: 50
+            }];
 
-    // 5. Scene 2 Placeholder
-    function drawAlbumDetails(albumData) {
-        currentScene = "albumDetails";
-        d3.select("#scene-description").text(`Drill down: Track streams for ${albumData.album}.`);
-        
-        // Clear previous scene
-        chartGroup.selectAll("*").remove(); 
-        
-        // Placeholder text until we build the chart
-        chartGroup.append("text")
-                  .attr("x", innerWidth / 2)
-                  .attr("y", innerHeight / 2)
-                  .attr("text-anchor", "middle")
-                  .text(`Scene 2: Building track chart for ${albumData.album}...`);
-    }
+            const makeAnnotations = d3.annotation().annotations(annotations);
+            chartGroup.append("g")
+                      .attr("class", "annotation-group")
+                      .style("font-size", "12px")
+                      .call(makeAnnotations)
+                      .style("opacity", 0)
+                      .transition()
+                      .delay(800) 
+                      .style("opacity", 1);
+        }
 
-    // Buttons at the top to reset the view
-    d3.select("#btn-overview").on("click", drawOverview);
+        // 5. Scene 2: Album Track Drill-Down
+        function drawAlbumDetails(albumData) {
+            currentScene = "albumDetails";
+            d3.select("#scene-description").text(`Drill down: Track streams and meanings for ${albumData.album}. Hover for details.`);
+            
+            // Clear previous scene
+            chartGroup.selectAll("*").remove(); 
+            
+            // Sort tracks by streams descending
+            const sortedTracks = albumData.tracks.sort((a, b) => b.streams - a.streams);
 
-</script>
+            // Set up Scales
+            const xScale = d3.scaleBand()
+                             .domain(sortedTracks.map(d => d.name))
+                             .range([0, innerWidth])
+                             .padding(0.2);
+
+            const yScale = d3.scaleLinear()
+                             .domain([0, d3.max(sortedTracks, d => d.streams) * 1.1])
+                             .range([innerHeight, 0]);
+
+            // Draw Axes
+            const yAxis = d3.axisLeft(yScale)
+                            .tickFormat(d => formatStreams(d));
+            
+            chartGroup.append("g").call(yAxis)
+                      .style("font-size", "14px");
+
+            chartGroup.append("g")
+                      .attr("transform", `translate(0,${innerHeight})`)
+                      .call(d3.axisBottom(xScale))
+                      .selectAll("text")
+                      .style("text-anchor", "end")
+                      .attr("dx", "-.8em")
+                      .attr("dy", ".15em")
+                      .attr("transform", "rotate(-45)") // Rotate long track titles
+                      .style("font-size", "11px");
+
+            // Draw Track Bars
+            chartGroup.selectAll(".track-bar")
+                      .data(sortedTracks)
+                      .enter()
+                      .append("rect")
+                      .attr("class", "track-bar")
+                      .attr("x", d => xScale(d.name))
+                      .attr("y", innerHeight)
+                      .attr("width", xScale.bandwidth())
+                      .attr("height", 0)
+                      .attr("fill", albumData.color) // Keep the parent album's aesthetic
+                      
+                      // Hover triggers showing track meaning
+                      .on("mouseover", (event, d) => {
+                          tooltip.style("opacity", 1)
+                                 .html(`<strong>${d.name}</strong><br>Streams: ${formatStreams(d.streams)}<br><hr style="margin:5px 0;"><em>"${d.meaning}"</em>`);
+                          d3.select(event.currentTarget).attr("stroke", "black").attr("stroke-width", 2);
+                      })
+                      .on("mousemove", (event) => {
+                          tooltip.style("left", (event.pageX + 15) + "px")
+                                 .style("top", (event.pageY - 20) + "px");
+                      })
+                      .on("mouseout", (event) => {
+                          tooltip.style("opacity", 0);
+                          d3.select(event.currentTarget).attr("stroke", "none");
+                      })
+                      
+                      // Enter transition
+                      .transition()
+                      .duration(800)
+                      .attr("y", d => yScale(d.streams))
+                      .attr("height", d => innerHeight - yScale(d.streams));
+
+            // Scene 2 Annotation (Points out the top track automatically)
+            const topTrack = sortedTracks[0];
+            const annotations = [{
+                note: {
+                    label: `Most streamed track on the album with ${formatStreams(topTrack.streams)}.`,
+                    title: "Top Track",
+                    wrap: 120
+                },
+                x: xScale(topTrack.name) + xScale.bandwidth() / 2,
+                y: yScale(topTrack.streams),
+                dy: -20,
+                dx: 30
+            }];
+
+            const makeAnnotations = d3.annotation().annotations(annotations);
+            chartGroup.append("g")
+                      .attr("class", "annotation-group")
+                      .style("font-size", "12px")
+                      .call(makeAnnotations)
+                      .style("opacity", 0)
+                      .transition()
+                      .delay(800)
+                      .style("opacity", 1);
+        }
+
+        // 6. Utility Functions
+        // Wraps SVG text for long album names on the X-axis
+        function wrapText(text, width) {
+            text.each(function() {
+                let text = d3.select(this),
+                    words = text.text().split(/\s+/).reverse(),
+                    word,
+                    line = [],
+                    lineNumber = 0,
+                    lineHeight = 1.1, 
+                    y = text.attr("y"),
+                    dy = parseFloat(text.attr("dy") || 0),
+                    tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+                while (word = words.pop()) {
+                    line.push(word);
+                    tspan.text(line.join(" "));
+                    if (tspan.node().getComputedTextLength() > width && line.length > 1) {
+                        line.pop();
+                        tspan.text(line.join(" "));
+                        line = [word];
+                        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                    }
+                }
+            });
+        }
+
+        // Back trigger to return to Scene 1
+        d3.select("#btn-overview").on("click", drawOverview);
+
+    </script>
 </body>
 </html>
