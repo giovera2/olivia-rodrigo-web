@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Olivia Rodrigo: Album to Track Analysis</title>
+    <!-- Load D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Load d3-annotation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f9f9; /* Maybe a light purple later for the SOUR/GUTS aesthetic? */
+        }
+        #chart-container {
+            width: 800px;
+            height: 600px;
+            margin: 0 auto;
+            background-color: white;
+            border: 1px solid #ccc;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+        .tooltip {
+            position: absolute;
+            background: white;
+            border: 1px solid #ccc;
+            padding: 10px;
+            pointer-events: none;
+            opacity: 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Olivia Rodrigo's Streaming Evolution</h1>
+    <p id="scene-description">Overview: Total streams for SOUR vs. GUTS vs. you seem pretty sad...</p>
+
+    <!-- Navigation for Drill-Down / Scenes -->
+    <div id="controls">
+        <button id="btn-overview">Album Overview</button>
+        <button id="btn-sour">Dive into SOUR</button>
+        <button id="btn-guts">Dive into GUTS</button>
+    </div>
+
+    <!-- D3 will draw the SVG inside this div -->
+    <div id="chart-container"></div>
+    <div id="tooltip" class="tooltip"></div>
+
+    <script>
+        // Setup the SVG canvas
+        const width = 800;
+        const height = 600;
+        const svg = d3.select("#chart-container")
+                      .append("svg")
+                      .attr("width", width)
+                      .attr("height", height);
+
+        // Parameters (State Variables)
+        let currentScene = "overview"; 
+
+        // Functions to clear and draw scenes will go here
+        function drawOverview() {
+            svg.selectAll("*").remove(); // Clear previous scene
+            // D3 code to draw the album-level chart goes here...
+            svg.append("text").attr("x", 400).attr("y", 300).attr("text-anchor", "middle").text("Album Overview Chart will go here");
+        }
+
+        // Triggers (Event Listeners)
+        d3.select("#btn-overview").on("click", function() {
+            currentScene = "overview";
+            drawOverview();
+        });
+
+        // Initialize the first scene
+        drawOverview();
+    </script>
+</body>
+</html>
